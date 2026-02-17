@@ -2,13 +2,38 @@
 name = "mir2-rs"
 version = "0.1.0"
 edition = "2024"
+description = "The Legend of Mir 2 Client - Rust Implementation with Bevy"
+authors = ["Mir2-RS Team"]
 
+[lib]
+name = "mir2_rs"
+path = "src/lib.rs"
 
 [[bin]]
 name = "mir2-rs"
 path = "src/main.rs"
 
+[features]
+default = ["bevy/dynamic_linking"]
+dev = ["bevy/file_watcher", "bevy/trace"]
+gui = ["slint", "rfd"]
+
 [dependencies]
+# Bevy 游戏引擎 (2D)
+bevy = { version = "0.18", default-features = false, features = [
+    "bevy_core_pipeline",
+    "bevy_render",
+    "bevy_sprite",
+    "bevy_text",
+    "bevy_ui",
+    "bevy_asset",
+    "bevy_state",
+    "bevy_winit",
+    "png",
+    "x11",
+    "wayland",
+] }
+
 # 图像处理
 image = "0.25"
 png = "0.18"
@@ -25,6 +50,7 @@ anyhow = "1.0"
 
 # 序列化
 serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
 
 # 日志
 tracing = "0.1"
@@ -33,6 +59,9 @@ tracing-appender = "0.2"
 
 # 异步运行时
 tokio = { version = "1.35", features = ["full"] }
+
+# 路径处理
+directories = "5.0"
 
 # GUI 相关 (仅在 gui feature 启用时编译)
 slint = { version = "1.8", optional = true }

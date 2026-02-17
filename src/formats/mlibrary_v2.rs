@@ -391,10 +391,10 @@ impl MLibraryV2 {
             return Ok(());
         }
 
-        if let Some(ref mut img) = self.images[index]
-            && !img.texture_valid
-        {
-            img.create_texture()?;
+        if let Some(ref mut img) = self.images[index] {
+            if !img.texture_valid {
+                img.create_texture()?;
+            }
         }
 
         Ok(())
