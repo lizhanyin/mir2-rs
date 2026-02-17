@@ -1,0 +1,54 @@
+[package]
+name = "mir2-rs"
+version = "0.1.0"
+edition = "2024"
+
+
+[[bin]]
+name = "mir2-rs"
+path = "src/main.rs"
+
+[dependencies]
+# 图像处理
+image = "0.25"
+png = "0.18"
+
+# 压缩库
+flate2 = "1.0"
+
+# 二进制读写
+byteorder = "1.5"
+
+# 错误处理
+thiserror = "2.0"
+anyhow = "1.0"
+
+# 序列化
+serde = { version = "1.0", features = ["derive"] }
+
+# 日志
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+tracing-appender = "0.2"
+
+# 异步运行时
+tokio = { version = "1.35", features = ["full"] }
+
+# GUI 相关 (仅在 gui feature 启用时编译)
+slint = { version = "1.8", optional = true }
+rfd = { version = "0.17", optional = true }
+
+[build-dependencies]
+
+
+# Release 优化配置
+[profile.release]
+lto = "thin"      # 链接时优化，减小二进制大小并提升性能
+opt-level = 3     # 最高优化级别
+codegen-units = 1 # 单个代码生成单元，更好的优化（编译更慢，运行更快）
+strip = true      # 剥离符号信息，减小二进制大小
+panic = "abort"   # panic 时直接中止，减少 panic 处理代码
+
+# 针对 Bevy 依赖的优化（即使开发模式也优化依赖）
+[profile.dev.package."*"]
+opt-level = 3
