@@ -1,7 +1,7 @@
 //! 资源加载器
 
 use crate::core::GameConfig;
-use crate::formats::LibraryLoader;
+use super::formats::LibraryLoader;
 use bevy::prelude::*;
 
 /// 资源加载器

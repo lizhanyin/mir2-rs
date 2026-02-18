@@ -8,6 +8,8 @@ pub enum SceneState {
     #[default]
     Loading,
     Login,
+    /// 登录成功动画
+    LoginSuccess,
     SelectChar,
     Game,
 }

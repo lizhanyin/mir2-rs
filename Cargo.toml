@@ -5,18 +5,20 @@ edition = "2024"
 description = "The Legend of Mir 2 Client - Rust Implementation with Bevy"
 authors = ["Mir2-RS Team"]
 
-[lib]
-name = "mir2_rs"
-path = "src/lib.rs"
+# [lib]
+# name = "mir2_rs"
+# path = "src/lib.rs"
 
 [[bin]]
 name = "mir2-rs"
 path = "src/main.rs"
 
 [features]
-default = ["bevy/dynamic_linking"]
+default = []
+# 动态链接 - 仅用于 release 构建加速编译
+# 使用方式: cargo build --release --features dynamic_linking
+dynamic_linking = ["bevy/dynamic_linking"]
 dev = ["bevy/file_watcher", "bevy/trace"]
-gui = ["slint", "rfd"]
 
 [dependencies]
 # Bevy 游戏引擎 (2D)
@@ -29,10 +31,21 @@ bevy = { version = "0.18", default-features = false, features = [
     "bevy_asset",
     "bevy_state",
     "bevy_winit",
+    "bevy_log",
+    "bevy_color",
+    "multi_threaded",
+    "picking",
+    "ui_picking",
+    "default_font",
     "png",
+    "jpeg",
     "x11",
     "wayland",
 ] }
+
+# bevy_extended_ui - HTML/CSS UI 框架 (禁用默认fluent避免sqlite3依赖)
+bevy_extended_ui = { version = "1.4.0-beta.3", default-features = false, features = ["css-breakpoints"] }
+bevy_extended_ui_macros = "1.4.0-beta.3"
 
 # 图像处理
 image = "0.25"
@@ -62,10 +75,6 @@ tokio = { version = "1.35", features = ["full"] }
 
 # 路径处理
 directories = "5.0"
-
-# GUI 相关 (仅在 gui feature 启用时编译)
-slint = { version = "1.8", optional = true }
-rfd = { version = "0.17", optional = true }
 
 [build-dependencies]
 

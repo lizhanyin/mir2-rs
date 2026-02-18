@@ -1,7 +1,18 @@
-//! 登录场景
+//! 登录场景 - 使用 bevy_extended_ui
+//!
+//! 背景图片从 ChrSel.wzl 库加载：
+//! - index=22: 登录背景图片
+//!
+//! 登录成功后的动画在 LoginSuccess 场景中播放
 
 use bevy::prelude::*;
-use crate::core::{GameState, SceneState};
+use bevy_extended_ui::html::{HtmlEvent, HtmlSource, HtmlSubmit};
+use bevy_extended_ui::io::HtmlAsset;
+use bevy_extended_ui::registry::UiRegistry;
+use bevy_extended_ui_macros::html_fn;
+
+use crate::core::{GameConfig, GameState, SceneState};
+use crate::resource::load_bevy_images_by_indices_from_path;
 
 /// 登录场景插件
 pub struct LoginScenePlugin;
@@ -9,8 +20,7 @@ pub struct LoginScenePlugin;
 impl Plugin for LoginScenePlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(SceneState::Login), setup_login)
-            .add_systems(OnExit(SceneState::Login), cleanup_login)
-            .add_systems(Update, login_system.run_if(in_state(SceneState::Login)));
+            .add_systems(OnExit(SceneState::Login), cleanup_login);
     }
 }
 
@@ -18,112 +28,115 @@ impl Plugin for LoginScenePlugin {
 #[derive(Component)]
 struct LoginScreen;
 
-/// 登录按钮
+/// 登录背景标记
 #[derive(Component)]
-struct LoginButton;
+struct LoginBackground;
 
-fn setup_login(mut commands: Commands) {
-    // 创建登录界面
-    commands.spawn((
-        Node {
-            width: Val::Percent(100.0),
-            height: Val::Percent(100.0),
-            align_items: AlignItems::Center,
-            justify_content: JustifyContent::Center,
-            ..default()
-        },
-        BackgroundColor(Color::srgb(0.1, 0.1, 0.2)),
-        LoginScreen,
-    )).with_children(|parent| {
-        // 登录框
-        parent.spawn((
-            Node {
-                width: Val::Px(300.0),
-                height: Val::Px(200.0),
-                flex_direction: FlexDirection::Column,
-                align_items: AlignItems::Center,
-                justify_content: JustifyContent::Center,
-                row_gap: Val::Px(10.0),
-                padding: UiRect::all(Val::Px(20.0)),
-                border: UiRect::all(Val::Px(2.0)),
-                border_radius: BorderRadius::all(Val::Px(10.0)),
-                ..default()
-            },
-            BackgroundColor(Color::srgb(0.2, 0.2, 0.3)),
-            BorderColor::all(Color::srgb(0.4, 0.4, 0.5)),
-        )).with_children(|login_box| {
-            // 标题
-            login_box.spawn((
-                Text::new("传奇世界"),
-                TextFont {
-                    font_size: 28.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(1.0, 0.8, 0.0)),
+/// 登录背景图片索引
+const LOGIN_BG_INDEX: usize = 22;
+
+/// 库名称
+const LIBRARY_NAME: &str = "data/ChrSel";
+
+fn setup_login(
+    mut reg: ResMut<UiRegistry>,
+    asset_server: Res<AssetServer>,
+    mut commands: Commands,
+    config: Res<GameConfig>,
+    mut images: ResMut<Assets<Image>>,
+) {
+    // 加载登录页面 HTML
+    let handle: Handle<HtmlAsset> = asset_server.load("ui/login.html");
+    reg.add_and_use("login_page".to_string(), HtmlSource::from_handle(handle));
+
+    tracing::info!("加载登录背景资源: {:?}", config.resource_path);
+
+    // 加载背景图片 (index=22)
+    if let Ok(bg_images) = load_bevy_images_by_indices_from_path(
+        &config.resource_path,
+        LIBRARY_NAME,
+        &[LOGIN_BG_INDEX],
+    ) {
+        if let Some(Some(bevy_image)) = bg_images.into_iter().next() {
+            let image_handle = images.add(bevy_image);
+
+            // 生成背景精灵
+            commands.spawn((
+                Sprite::from_image(image_handle),
+                Transform::from_xyz(0.0, 0.0, -1.0),
+                LoginBackground,
             ));
 
-            // 提示文本
-            login_box.spawn((
-                Text::new("点击登录进入游戏"),
-                TextFont {
-                    font_size: 16.0,
-                    ..default()
-                },
-                TextColor(Color::srgb(0.7, 0.7, 0.7)),
-            ));
+            tracing::info!("登录背景图片加载成功 (index={})", LOGIN_BG_INDEX);
+        }
+    } else {
+        tracing::warn!("无法加载登录背景图片 (index={})", LOGIN_BG_INDEX);
+    }
 
-            // 登录按钮
-            login_box.spawn((
-                Button,
-                Node {
-                    width: Val::Px(120.0),
-                    height: Val::Px(40.0),
-                    align_items: AlignItems::Center,
-                    justify_content: JustifyContent::Center,
-                    border: UiRect::all(Val::Px(1.0)),
-                    border_radius: BorderRadius::all(Val::Px(5.0)),
-                    ..default()
-                },
-                BackgroundColor(Color::srgb(0.3, 0.5, 0.3)),
-                BorderColor::all(Color::srgb(0.4, 0.6, 0.4)),
-                LoginButton,
-            )).with_children(|btn| {
-                btn.spawn((
-                    Text::new("登 录"),
-                    TextFont {
-                        font_size: 18.0,
-                        ..default()
-                    },
-                    TextColor(Color::srgb(1.0, 1.0, 1.0)),
-                ));
-            });
-        });
-    });
+    // 标记登录界面已加载
+    commands.spawn(LoginScreen);
 
     tracing::info!("进入登录场景");
 }
 
-fn cleanup_login(mut commands: Commands, query: Query<Entity, With<LoginScreen>>) {
+fn cleanup_login(
+    mut commands: Commands,
+    query: Query<Entity, With<LoginScreen>>,
+    bg_query: Query<Entity, With<LoginBackground>>,
+    mut reg: ResMut<UiRegistry>,
+) {
+    // 移除 UI
+    reg.remove("login_page");
+
+    // 移除登录界面标记实体
     for entity in query.iter() {
-        commands.entity(entity).despawn_children();
         commands.entity(entity).try_despawn();
+    }
+
+    // 移除背景精灵
+    for entity in bg_query.iter() {
+        commands.entity(entity).try_despawn();
+    }
+
+    tracing::info!("退出登录场景");
+}
+
+/// 处理登录表单提交
+#[html_fn("on_login")]
+fn on_login(
+    In(event): In<HtmlSubmit>,
+    mut next_state: ResMut<NextState<SceneState>>,
+    mut game_state: ResMut<GameState>,
+) {
+    let username = event.data.get("username").cloned().unwrap_or_default();
+    let password = event.data.get("password").cloned().unwrap_or_default();
+
+    tracing::info!("登录请求: username='{}', password='{}'", username, password);
+
+    // 模拟登录验证
+    if !username.is_empty() && !password.is_empty() {
+        game_state.is_logged_in = true;
+        game_state.player_name = username.clone();
+        game_state.player_id = 1001;
+
+        tracing::info!("登录成功，玩家: {}", username);
+        // 先切换到登录成功动画场景
+        next_state.set(SceneState::LoginSuccess);
+    } else {
+        tracing::warn!("登录失败：用户名或密码为空");
     }
 }
 
-fn login_system(
-    mut next_state: ResMut<NextState<SceneState>>,
-    mut game_state: ResMut<GameState>,
-    query: Query<&Interaction, (Changed<Interaction>, With<LoginButton>)>,
-) {
-    for interaction in query.iter() {
-        if *interaction == Interaction::Pressed {
-            // 模拟登录成功
-            game_state.is_logged_in = true;
-            game_state.player_name = "TestPlayer".to_string();
-            game_state.player_id = 1001;
+/// 处理注册链接点击
+#[html_fn("on_register")]
+fn on_register(In(_event): In<HtmlEvent>) {
+    tracing::info!("点击注册账号");
+    // TODO: 实现注册功能
+}
 
-            tracing::info!("登录成功，切换到选角色场景");
-            next_state.set(SceneState::SelectChar);
-        }
-    }
+/// 处理忘记密码链接点击
+#[html_fn("on_forgot")]
+fn on_forgot(In(_event): In<HtmlEvent>) {
+    tracing::info!("点击忘记密码");
+    // TODO: 实现找回密码功能
 }

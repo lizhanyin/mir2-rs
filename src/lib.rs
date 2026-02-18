@@ -4,9 +4,7 @@
 
 pub mod core;
 pub mod error;
-pub mod formats;
 pub mod game;
-pub mod image;
 pub mod network;
 pub mod render;
 pub mod resource;
@@ -15,4 +13,4 @@ pub mod ui;
 
 // 重新导出常用类型
 pub use error::{GameError, GameResult, LibraryError, Result};
-pub use formats::{LibraryInfo, LibraryLoader, LibraryType};
+pub use resource::{LibraryInfo, LibraryLoader, LibraryType};

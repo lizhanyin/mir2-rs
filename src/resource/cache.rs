@@ -1,6 +1,6 @@
 //! 资源缓存
 
-use crate::formats::{LibraryInfo, LibraryLoader};
+use super::formats::{LibraryInfo, LibraryLoader};
 use bevy::prelude::*;
 use std::collections::HashMap;
 use std::sync::{Arc, Mutex};

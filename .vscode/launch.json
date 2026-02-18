@@ -1,0 +1,71 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug",
+            "cargo": {
+                "args": ["build", "--bin=mir2_rs"],
+                "filter": { "name": "mir2_rs", "kind": "bin" }
+            },
+            "cwd": "${workspaceFolder}",
+            "args": [ 
+                "-r",
+                "E:\\Game\\Online\\Legend of mir"
+            ],
+            "env": {
+                "RUST_BACKTRACE": "1",
+                "RUST_LOG": "mir2_rs=debug,bevy_extended_ui=info"
+            },
+            "sourceLanguages": ["rust"]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug - 自定义资源路径",
+            "cargo": {
+                "args": ["build", "--bin=mir2_rs"],
+                "filter": { "name": "mir2_rs", "kind": "bin" }
+            },
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-r",
+                "${input:resourcePath}"
+            ],
+            "env": {
+                "RUST_BACKTRACE": "1",
+                "RUST_LOG": "mir2_rs=debug,bevy_extended_ui=info"
+            },
+            "sourceLanguages": ["rust"]
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
+            "name": "Debug - 全屏模式",
+            "cargo": {
+                "args": ["build", "--bin=mir2_rs"],
+                "filter": { "name": "mir2_rs", "kind": "bin" }
+            },
+            "cwd": "${workspaceFolder}",
+            "args": [
+                "-r",
+                "E:\\Game\\Online\\Legend of mir",
+                "-f"
+            ],
+            "env": {
+                "RUST_BACKTRACE": "1",
+                "RUST_LOG": "mir2_rs=debug,bevy_extended_ui=info"
+            },
+            "sourceLanguages": ["rust"]
+        }
+    ],
+    "inputs": [
+        {
+            "id": "resourcePath",
+            "type": "promptString",
+            "description": "游戏资源目录路径",
+            "default": "E:\\Game\\Online\\Legend of mir"
+        }
+    ]
+}

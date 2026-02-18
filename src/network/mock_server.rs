@@ -122,7 +122,7 @@ impl MockServer {
             MessageId::CM_CLIENTBEGIN => Some(MockResponse::Message(MessageResponse {
                 msg_id: msg_id.0,
                 success: true,
-                message: "欢迎来到传奇世界!".to_string(),
+                message: "欢迎来到热血传奇!".to_string(),
             })),
             _ => None,
         }

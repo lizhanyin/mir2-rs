@@ -1,0 +1,160 @@
+/* 热血传奇登录页面样式 */
+/* 背景图片通过 Bevy 2D 精灵显示，UI 需要透明 */
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  padding-bottom: 80px;
+  /* 透明背景，让 Bevy 精灵背景显示 */
+  background: transparent;
+}
+
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  max-width: 320px;
+  padding: 20px;
+}
+
+.login-box {
+  background: rgba(20, 20, 40, 0.85);
+  border-radius: 8px;
+  padding: 30px 25px;
+  border: 2px solid #554433;
+  width: 100%;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+}
+
+.title {
+  text-align: center;
+  color: #ffd700;
+  font-size: 28px;
+  font-weight: bold;
+  margin: 0 0 5px 0;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.subtitle {
+  text-align: center;
+  color: #aaa888;
+  font-size: 12px;
+  margin: 0 0 25px 0;
+  letter-spacing: 2px;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.form-group label {
+  color: #cccccc;
+  font-size: 13px;
+}
+
+.form-group input {
+  background: rgba(30, 30, 50, 0.9);
+  border: 1px solid #444433;
+  border-radius: 4px;
+  padding: 10px 12px;
+  color: #ffffff;
+  font-size: 14px;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #ffd700;
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+}
+
+.form-group input::placeholder {
+  color: #666666;
+}
+
+.form-actions {
+  margin-top: 8px;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%);
+  border: none;
+  border-radius: 4px;
+  color: #1a1a2e;
+  font-size: 15px;
+  font-weight: bold;
+  cursor: pointer;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.btn-login:hover {
+  background: linear-gradient(180deg, #ffcc00 0%, #bb8800 100%);
+}
+
+.btn-login:active {
+  background: linear-gradient(180deg, #ffaa00 0%, #997700 100%);
+}
+
+.btn-login:disabled {
+  background: #555555;
+  color: #888888;
+  cursor: not-allowed;
+}
+
+.form-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 12px;
+}
+
+.form-links a {
+  color: #888877;
+  font-size: 11px;
+  text-decoration: none;
+}
+
+.form-links a:hover {
+  color: #ffd700;
+}
+
+.footer {
+  margin-top: 20px;
+  text-align: center;
+}
+
+.footer p {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 11px;
+  margin: 0;
+}
+
+/* 验证错误样式 */
+input:invalid {
+  border-color: #ff4444;
+}
+
+/* 加载动画 */
+.loading {
+  opacity: 0.7;
+  pointer-events: none;
+}
