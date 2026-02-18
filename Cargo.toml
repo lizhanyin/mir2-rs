@@ -17,12 +17,13 @@ path = "src/main.rs"
 default = []
 # 动态链接 - 仅用于 release 构建加速编译
 # 使用方式: cargo build --release --features dynamic_linking
-dynamic_linking = ["bevy/dynamic_linking"]
+# dynamic_linking = ["bevy/dynamic_linking"]
 dev = ["bevy/file_watcher", "bevy/trace"]
 
 [dependencies]
 # Bevy 游戏引擎 (2D)
 bevy = { version = "0.18", default-features = false, features = [
+    "debug",
     "bevy_core_pipeline",
     "bevy_render",
     "bevy_sprite",
@@ -44,7 +45,9 @@ bevy = { version = "0.18", default-features = false, features = [
 ] }
 
 # bevy_extended_ui - HTML/CSS UI 框架 (禁用默认fluent避免sqlite3依赖)
-bevy_extended_ui = { version = "1.4.0-beta.3", default-features = false, features = ["css-breakpoints"] }
+bevy_extended_ui = { version = "1.4.0-beta.3", default-features = false, features = [
+    "css-breakpoints",
+] }
 bevy_extended_ui_macros = "1.4.0-beta.3"
 
 # 图像处理

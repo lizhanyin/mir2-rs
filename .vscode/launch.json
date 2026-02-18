@@ -1,13 +1,14 @@
 {
     "version": "0.2.0",
     "configurations": [
+        
         {
             "type": "lldb",
             "request": "launch",
             "name": "Debug",
             "cargo": {
-                "args": ["build", "--bin=mir2_rs"],
-                "filter": { "name": "mir2_rs", "kind": "bin" }
+                "args": ["build", "--bin=mir2-rs"],
+                "filter": { "name": "mir2-rs", "kind": "bin" }
             },
             "cwd": "${workspaceFolder}",
             "args": [ 
@@ -25,8 +26,8 @@
             "request": "launch",
             "name": "Debug - 自定义资源路径",
             "cargo": {
-                "args": ["build", "--bin=mir2_rs"],
-                "filter": { "name": "mir2_rs", "kind": "bin" }
+                "args": ["build", "--bin=mir2-rs"],
+                "filter": { "name": "mir2-rs", "kind": "bin" }
             },
             "cwd": "${workspaceFolder}",
             "args": [
@@ -44,8 +45,8 @@
             "request": "launch",
             "name": "Debug - 全屏模式",
             "cargo": {
-                "args": ["build", "--bin=mir2_rs"],
-                "filter": { "name": "mir2_rs", "kind": "bin" }
+                "args": ["build", "--bin=mir2-rs"],
+                "filter": { "name": "mir2-rs", "kind": "bin" }
             },
             "cwd": "${workspaceFolder}",
             "args": [
