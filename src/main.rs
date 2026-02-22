@@ -3,7 +3,7 @@
 //! 基于 Bevy 游戏引擎的《传奇2》客户端
 
 use bevy::asset::{AssetMetaCheck, AssetPlugin};
-use bevy::{log::LogPlugin, prelude::*};
+use bevy::prelude::*;
 use bevy_extended_ui::{ExtendedUiConfiguration, ExtendedUiPlugin};
 use mir2_rs::core::{GameConfig, GameStatePlugin};
 use mir2_rs::game::GamePlugin;
@@ -12,8 +12,12 @@ use mir2_rs::resource::ResourcePlugin;
 use mir2_rs::scene::ScenePlugin;
 use mir2_rs::ui::UiPlugin;
 use std::path::PathBuf;
+use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
 
 fn main() {
+    // 初始化日志（输出到文件和控制台）
+    init_logger();
+
     // 确保 assets 目录可访问（Debug 模式下切换工作目录）
     let assets_path = get_assets_path();
 
@@ -27,17 +31,17 @@ fn main() {
     let bevy_asset_path = assets_path.to_string_lossy().to_string();
 
     // 显示资源目录
-    println!("========================================");
-    println!("热血传奇 - Mir2-RS");
-    println!("========================================");
-    println!("游戏资源目录: {}", config.resource_path.display());
-    println!("窗口大小: {}x{}", config.screen_width, config.screen_height);
-    println!("全屏模式: {}", config.fullscreen);
-    println!("========================================");
+    tracing::info!("========================================");
+    tracing::info!("热血传奇 - Mir2-RS");
+    tracing::info!("========================================");
+    tracing::info!("游戏资源目录: {}", config.resource_path.display());
+    tracing::info!("窗口大小: {}x{}", config.screen_width, config.screen_height);
+    tracing::info!("全屏模式: {}", config.fullscreen);
+    tracing::info!("========================================");
 
     // 创建 Bevy 应用
     App::new()
-        // 添加默认插件，配置日志级别
+        // 添加默认插件（不包含 LogPlugin，使用自定义日志）
         .add_plugins(
             DefaultPlugins
                 .set(WindowPlugin {
@@ -50,11 +54,11 @@ fn main() {
                     }),
                     ..default()
                 })
-                .set(LogPlugin {
-                    level: bevy::log::Level::DEBUG,
-                    filter: "mir2_rs=debug,bevy_extended_ui=info,wgpu=error,naga=error".to_string(),
-                    ..default()
-                })
+                // .set(LogPlugin {
+                //     level: bevy::log::Level::DEBUG,
+                //     filter: "mir2_rs=debug,bevy_extended_ui=info,wgpu=error,naga=error".to_string(),
+                //     ..default()
+                // })
                 .set(AssetPlugin {
                     file_path: bevy_asset_path,
                     meta_check: AssetMetaCheck::Never,
@@ -112,4 +116,51 @@ fn get_assets_path() -> PathBuf {
 
     // 默认返回当前目录下的 assets
     PathBuf::from("assets")
+}
+
+/// 初始化日志系统（输出到文件和控制台）
+fn init_logger() {
+    use tracing_appender::{non_blocking, rolling};
+
+    // 获取日志目录
+    let log_dir = get_log_dir();
+
+    // 创建日志文件写入器（按日期滚动）
+    let file_appender = rolling::daily(&log_dir, "mir2-rs.log");
+    let (non_blocking_file, _guard) = non_blocking(file_appender);
+
+    // 配置日志过滤器
+    let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| {
+        EnvFilter::new("mir2_rs=debug,bevy_extended_ui=info,wgpu=error,naga=error")
+    });
+
+    // 初始化订阅器（同时输出到控制台和文件）
+    tracing_subscriber::registry()
+        .with(filter)
+        .with(tracing_subscriber::fmt::layer().with_writer(std::io::stdout))
+        .with(
+            tracing_subscriber::fmt::layer()
+                .with_ansi(false)
+                .with_writer(non_blocking_file),
+        )
+        .init();
+
+    // tracing::info!("日志目录: {}", log_dir.display());
+}
+
+/// 获取日志目录路径
+fn get_log_dir() -> PathBuf {
+    // 优先使用可执行文件所在目录的 logs 子目录
+    if let Ok(exe_path) = std::env::current_exe()
+        && let Some(exe_dir) = exe_path.parent()
+    {
+        let logs_dir = exe_dir.join("logs");
+        if std::fs::create_dir_all(&logs_dir).is_err() {
+            return exe_dir.to_path_buf();
+        }
+        return logs_dir;
+    }
+
+    // 默认使用当前目录
+    PathBuf::from(".")
 }

@@ -36,12 +36,22 @@ impl Color {
 
     /// 创建黑色
     pub const fn black() -> Self {
-        Self { a: 255, r: 0, g: 0, b: 0 }
+        Self {
+            a: 255,
+            r: 0,
+            g: 0,
+            b: 0,
+        }
     }
 
     /// 创建白色
     pub const fn white() -> Self {
-        Self { a: 255, r: 255, g: 255, b: 255 }
+        Self {
+            a: 255,
+            r: 255,
+            g: 255,
+            b: 255,
+        }
     }
 
     /// 检查颜色是否完全透明
@@ -106,7 +116,11 @@ impl std::fmt::Display for Color {
         if self.a == 255 {
             write!(f, "Color(#{:02X}{:02X}{:02X})", self.r, self.g, self.b)
         } else {
-            write!(f, "Color(#{:02X}{:02X}{:02X}{:02X})", self.r, self.g, self.b, self.a)
+            write!(
+                f,
+                "Color(#{:02X}{:02X}{:02X}{:02X})",
+                self.r, self.g, self.b, self.a
+            )
         }
     }
 }
@@ -116,7 +130,11 @@ impl std::fmt::LowerHex for Color {
         if self.a == 255 {
             write!(f, "{:02x}{:02x}{:02x}", self.r, self.g, self.b)
         } else {
-            write!(f, "{:02x}{:02x}{:02x}{:02x}", self.r, self.g, self.b, self.a)
+            write!(
+                f,
+                "{:02x}{:02x}{:02x}{:02x}",
+                self.r, self.g, self.b, self.a
+            )
         }
     }
 }
@@ -126,7 +144,11 @@ impl std::fmt::UpperHex for Color {
         if self.a == 255 {
             write!(f, "{:02X}{:02X}{:02X}", self.r, self.g, self.b)
         } else {
-            write!(f, "{:02X}{:02X}{:02X}{:02X}", self.r, self.g, self.b, self.a)
+            write!(
+                f,
+                "{:02X}{:02X}{:02X}{:02X}",
+                self.r, self.g, self.b, self.a
+            )
         }
     }
 }
@@ -174,8 +196,8 @@ impl BrightnessSortedPalette {
         // 按亮度排序 (使用简化的亮度公式: 0.299*R + 0.587*G + 0.114*B)
         indices.sort_by_key(|&i| {
             let c = DEFAULT_PALETTE[i];
-            let brightness = (299 * c.r as u32 + 587 * c.g as u32 + 114 * c.b as u32) / 1000;
-            brightness
+
+            (299 * c.r as u32 + 587 * c.g as u32 + 114 * c.b as u32) / 1000
         });
 
         Self { indices }
@@ -346,8 +368,8 @@ mod tests {
 
     #[test]
     fn test_blend() {
-        let color1 = Color::new(255, 255, 0, 0);  // 红色
-        let color2 = Color::new(255, 0, 255, 0);  // 绿色
+        let color1 = Color::new(255, 255, 0, 0); // 红色
+        let color2 = Color::new(255, 0, 255, 0); // 绿色
         let blended = color1.blend(color2, 128);
         // 由于整数除法：
         // R: (255 * 127 + 0 * 128) / 255 = 32385 / 255 = 127

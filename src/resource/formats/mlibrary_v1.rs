@@ -176,18 +176,38 @@ impl MLibraryV1 {
         // 跳转到数据开始位置 (偏移 + 16字节头部)
         reader.seek(SeekFrom::Start(offset + 16))?;
 
+        // 计算每行字节数
+        let row_bytes = if bo16bit {
+            ((width as i32) * 2) as usize
+        } else {
+            width as usize
+        };
+        let height_usize = height as usize;
+
         // 读取图像数据
         let bytes = if n_size == 0 {
-            // 未压缩 - 直接读取原始数据
-            // 使用 i32 避免两个 i16 相乘溢出
-            let size = if bo16bit {
-                ((width as i32) * (height as i32) * 2) as usize
-            } else {
-                ((width as i32) * (height as i32)) as usize
-            };
-            let mut buf = vec![0u8; size];
-            reader.read_exact(&mut buf)?;
-            buf
+            // 未压缩 - 尝试先读取紧凑大小，如果数据不够再尝试对齐大小
+            let packed_size = row_bytes * height_usize;
+            let aligned_row_bytes = row_bytes.div_ceil(4) * 4;
+            let aligned_size = aligned_row_bytes * height_usize;
+
+            // 先尝试读取紧凑大小
+            let mut buf = vec![0u8; packed_size];
+            match reader.read_exact(&mut buf) {
+                Ok(()) => buf,
+                Err(_) => {
+                    // 如果紧凑大小读取失败，尝试读取对齐大小
+                    reader.seek(SeekFrom::Start(offset + 16))?;
+                    buf.resize(aligned_size, 0);
+                    if reader.read_exact(&mut buf).is_err() {
+                        // 如果对齐大小也失败，读取能读取的所有数据
+                        reader.seek(SeekFrom::Start(offset + 16))?;
+                        buf.clear();
+                        let _ = reader.read_to_end(&mut buf);
+                    }
+                    buf
+                }
+            }
         } else {
             // Zlib 压缩
             let mut compressed_data = vec![0u8; n_size as usize];
@@ -229,11 +249,34 @@ impl MLibraryV1 {
         }
 
         let mut rgba_img = RgbaImage::new(width, height);
-        let mut idx = 0;
 
-        // 计算每行字节数 (需要4字节对齐)
-        let row_bytes = if bo16bit { width * 2 } else { width };
+        // 计算每行字节数
+        let row_bytes = if bo16bit {
+            (width * 2) as usize
+        } else {
+            width as usize
+        };
+        // 4字节对齐 (BMP 格式要求)
         let aligned_row_bytes = row_bytes.div_ceil(4) * 4;
+
+        // 检测是否使用了行对齐：如果数据长度等于对齐后的大小，则使用对齐
+        let expected_aligned_size = aligned_row_bytes * height as usize;
+        let expected_packed_size = row_bytes * height as usize;
+        let use_alignment = bytes.len() == expected_aligned_size;
+
+        tracing::debug!(
+            "图像转换: {}x{}, row_bytes={}, aligned_row_bytes={}, data_len={}, expected_aligned={}, expected_packed={}, use_alignment={}",
+            width,
+            height,
+            row_bytes,
+            aligned_row_bytes,
+            bytes.len(),
+            expected_aligned_size,
+            expected_packed_size,
+            use_alignment
+        );
+
+        let mut idx = 0;
 
         for y in (0..height).rev() {
             for x in 0..width {
@@ -243,6 +286,9 @@ impl MLibraryV1 {
 
                 let pixel = if bo16bit {
                     // 16位颜色格式 (RGB565)
+                    if idx + 1 >= bytes.len() {
+                        break;
+                    }
                     let b1 = bytes[idx] as u16;
                     let b2 = bytes[idx + 1] as u16;
                     let color = (b2 << 8) | b1;
@@ -275,8 +321,10 @@ impl MLibraryV1 {
                 rgba_img.put_pixel(x, y, Rgba(pixel));
             }
 
-            // 跳过对齐填充字节
-            idx += (aligned_row_bytes - row_bytes) as usize;
+            // 只在使用对齐时跳过填充字节
+            if use_alignment {
+                idx += aligned_row_bytes - row_bytes;
+            }
         }
 
         img.image = Some(rgba_img);
