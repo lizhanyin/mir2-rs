@@ -4,6 +4,7 @@
 
 use bevy::asset::{AssetMetaCheck, AssetPlugin};
 use bevy::prelude::*;
+use bevy::window::{EnabledButtons, PrimaryWindow};
 use bevy_extended_ui::{ExtendedUiConfiguration, ExtendedUiPlugin};
 use mir2_rs::core::{GameConfig, GameStatePlugin};
 use mir2_rs::game::GamePlugin;
@@ -13,6 +14,9 @@ use mir2_rs::scene::ScenePlugin;
 use mir2_rs::ui::UiPlugin;
 use std::path::PathBuf;
 use tracing_subscriber::{EnvFilter, layer::SubscriberExt, util::SubscriberInitExt};
+
+/// 目标宽高比 4:3
+const ASPECT_RATIO: f32 = 4.0 / 3.0;
 
 fn main() {
     // 初始化日志（输出到文件和控制台）
@@ -50,6 +54,17 @@ fn main() {
                         resolution: (config.screen_width as u32, config.screen_height as u32)
                             .into(),
                         resizable: true,
+                        resize_constraints: WindowResizeConstraints {
+                            min_width: 800.0,
+                            min_height: 600.0,
+                            ..default()
+                        },
+                        // 禁用最大化按钮，保持 4:3 比例
+                        enabled_buttons: EnabledButtons {
+                            minimize: true,
+                            maximize: false,
+                            close: true,
+                        },
                         ..default()
                     }),
                     ..default()
@@ -83,6 +98,8 @@ fn main() {
             RenderPlugin,
             UiPlugin,
         ))
+        // 添加窗口比例保持系统
+        .add_systems(Update, maintain_aspect_ratio)
         // 运行应用
         .run();
 }
@@ -163,4 +180,35 @@ fn get_log_dir() -> PathBuf {
 
     // 默认使用当前目录
     PathBuf::from(".")
+}
+
+/// 保持窗口宽高比为 4:3
+/// 使用 changed 查询过滤器只在窗口大小变化时运行
+fn maintain_aspect_ratio(
+    mut windows: Query<&mut Window, (With<PrimaryWindow>, Changed<Window>)>,
+) {
+    for mut window in windows.iter_mut() {
+        let width = window.width();
+        let height = window.height();
+
+        // 计算当前宽高比
+        let current_aspect = width / height;
+
+        // 如果宽高比不是 4:3，则调整
+        if (current_aspect - ASPECT_RATIO).abs() > 0.01 {
+            // 根据宽度计算高度（保持 4:3）
+            let new_height = width / ASPECT_RATIO;
+
+            // 设置新的分辨率
+            window.resolution.set(width, new_height);
+
+            tracing::debug!(
+                "调整窗口比例 4:3: {:.0}x{:.0} -> {:.0}x{:.0}",
+                width,
+                height,
+                width,
+                new_height
+            );
+        }
+    }
 }

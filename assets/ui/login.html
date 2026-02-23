@@ -13,30 +13,20 @@
 
   <div class="login-container">
     <div class="login-box">
-      <!--       
-      <h1 class="title"><label>热血传奇</label></h1>
-      <p class="subtitle">The Legend of Mir 2</p> 
-      -->
-
       <form class="login-form" action="on_login" validate="登录">
+        <div class="">
+          <button type="button" class="btn-close" action="on_close"></button>
+        </div>
+        <div class="form-group empty-row"></div>
+        <div class="form-group empty-row"></div>
         <div class="form-group">
-          <label for="username">账号</label>
-          <input id="username"
-                 name="username"
-                 type="text"
-                 placeholder="请输入账号"
-                 required
-                 validation="length(3, 32)">
+          <label for="username"></label>
+          <input id="username" name="username" type="text" placeholder="" required validation="length(3, 32)">
         </div>
 
         <div class="form-group">
-          <label for="password">密码</label>
-          <input id="password"
-                 name="password"
-                 type="password"
-                 placeholder="请输入密码"
-                 required
-                 validation="length(6, 64)">
+          <label for="password"></label>
+          <input id="password" name="password" type="password" placeholder="" required validation="length(6, 64)">
         </div>
 
         <div class="form-actions">

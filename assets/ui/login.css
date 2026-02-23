@@ -1,5 +1,5 @@
 /* 热血传奇登录页面样式 */
-/* 背景图片通过 Bevy 2D 精灵显示，UI 需要透明 */
+/* 背景图片通过 CSS background-image 显示，图片从 ImageCache 加载 */
 
 * {
   box-sizing: border-box;
@@ -12,35 +12,42 @@ body {
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: flex-end;
-  padding-bottom: 80px;
-  /* 透明背景，让 Bevy 精灵背景显示 */
-  background: transparent;
+  align-items: center;
+  /* 使用 ImageCache 中的背景图片 (ChrSel_22.png) */
+  background-image: url("ChrSel_22.png");
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
 }
 
 .login-container {
+  border: 1px solid transparent;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  width: 100%;
-  max-width: 320px;
-  padding: 20px;
+  /* 使用 vw 单位，宽度高度都随窗口宽度变化 */
+  /* 原始: 296/800=37%, 254/800=31.75% */
+  width: 37vw;
+  height: 31.75vw;
+  border: 1px solid blue;
 }
 
 .login-box {
-  background: rgba(20, 20, 40, 0.85);
-  border-radius: 8px;
-  padding: 30px 25px;
-  border: 2px solid #554433;
+  /* 使用 ImageCache 中的表单背景图片 (Prguse_60.png) */
+  background-image: url("Prguse_60.png");
+  background-position: center;
+  background-size: 100% 100%;
+  background-repeat: no-repeat;
   width: 100%;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+  height: 100%;
+  position: relative;
 }
 
 .title {
   text-align: center;
   color: #ffd700;
-  font-size: 28px;
+  font-size: clamp(20px, 3vw, 32px);
   font-weight: bold;
   margin: 0 0 5px 0;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
@@ -49,7 +56,7 @@ body {
 .subtitle {
   text-align: center;
   color: #aaa888;
-  font-size: 12px;
+  font-size: clamp(10px, 1.5vw, 14px);
   margin: 0 0 25px 0;
   letter-spacing: 2px;
 }
@@ -57,27 +64,36 @@ body {
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: clamp(10px, 2vw, 20px);
+  width: 100%;
+  height: 100%;
+  border: 1px solid white;
 }
 
 .form-group {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
 }
 
 .form-group label {
   color: #cccccc;
-  font-size: 13px;
+  font-size: clamp(12px, 1.5vw, 16px);
+  min-width: 60px;
 }
 
 .form-group input {
-  background: rgba(30, 30, 50, 0.9);
-  border: 1px solid #444433;
+  background: rgba(255, 255, 255, 0.5);
+  border: 0;
   border-radius: 4px;
-  padding: 10px 12px;
+  padding: 8px 12px;
+  margin-left: auto;
+  margin-right: auto;
   color: #ffffff;
-  font-size: 14px;
+  font-size: clamp(14px, 1.8vw, 18px);
+  width: 22vw;
+  height: 3vw;
 }
 
 .form-group input:focus {
@@ -91,17 +107,31 @@ body {
 }
 
 .form-actions {
-  margin-top: 8px;
+  margin-top: clamp(10px, 2vw, 20px);
+  display: flex;
+  justify-content: center;
+}
+
+.btn-close {
+  position: absolute;
+  top: 3.4vw;
+  right: 3.4vw;
+  min-width: 2vw;
+  height: 2.7vw;
+  border: none;
+  background: rgba(255, 255, 255, 0.5);
+  cursor: pointer;
 }
 
 .btn-login {
-  width: 100%;
-  padding: 12px;
-  background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%);
+  width: clamp(80px, 12vw, 120px);
+  height: clamp(35px, 4.5vw, 50px);
+  padding: 8px 16px;
+  /* background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%); */
   border: none;
   border-radius: 4px;
   color: #1a1a2e;
-  font-size: 15px;
+  font-size: clamp(14px, 2vw, 18px);
   font-weight: bold;
   cursor: pointer;
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
@@ -124,12 +154,13 @@ body {
 .form-links {
   display: flex;
   justify-content: space-between;
-  margin-top: 12px;
+  margin-top: clamp(12px, 2vw, 20px);
+  padding: 0 10px;
 }
 
 .form-links a {
   color: #888877;
-  font-size: 11px;
+  font-size: clamp(11px, 1.4vw, 14px);
   text-decoration: none;
 }
 
@@ -157,4 +188,11 @@ input:invalid {
 .loading {
   opacity: 0.7;
   pointer-events: none;
+}
+
+.empty-row {
+  width: 100%;
+  height: 4vw;
+
+  border: 1px solid white;
 }
