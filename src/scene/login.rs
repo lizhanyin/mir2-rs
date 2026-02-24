@@ -15,7 +15,7 @@
 //! 登录成功后的动画在 LoginSuccess 场景中播放
 
 use bevy::prelude::*;
-use bevy_extended_ui::html::{HtmlEvent, HtmlSource, HtmlSubmit};
+use bevy_extended_ui::html::{HtmlEvent, HtmlInit, HtmlMouseOut, HtmlMouseOver, HtmlSource, HtmlSubmit};
 use bevy_extended_ui::io::HtmlAsset;
 use bevy_extended_ui::registry::UiRegistry;
 use bevy_extended_ui::ImageCache;
@@ -228,4 +228,58 @@ fn on_register(In(_event): In<HtmlEvent>) {
 fn on_forgot(In(_event): In<HtmlEvent>) {
     tracing::info!("点击忘记密码");
     // TODO: 实现找回密码功能
+}
+
+// ========== 关闭按钮事件 ==========
+
+/// 关闭按钮悬停图片缓存 key
+const BTN_CLOSE_HOVER_IMAGE: &str = "Prguse_64.png";
+
+/// 关闭按钮初始化事件
+#[html_fn("btn_close_init")]
+fn btn_close_init(In(event): In<HtmlInit>) {
+    tracing::debug!("关闭按钮初始化: entity={:?}", event.entity);
+}
+
+/// 关闭按钮点击事件 - 发送退出信号
+#[html_fn("on_close")]
+fn on_close(
+    In(_event): In<HtmlEvent>,
+    mut app_exit: bevy::ecs::message::MessageWriter<AppExit>,
+) {
+    tracing::info!("点击关闭按钮，退出游戏");
+    // 发送 AppExit 消息来退出应用
+    app_exit.write(AppExit::Success);
+}
+
+/// 关闭按钮鼠标进入 - 显示悬停图片
+#[html_fn("btn_close_enter")]
+fn btn_close_enter(
+    In(event): In<HtmlMouseOver>,
+    mut query: Query<&mut ImageNode>,
+    image_cache: Res<ImageCache>,
+) {
+    // 从缓存获取悬停图片
+    if let Some(hover_image) = image_cache.map.get(BTN_CLOSE_HOVER_IMAGE) {
+        // 查找按钮的 ImageNode 组件并设置悬停图片
+        if let Ok(mut image_node) = query.get_mut(event.entity) {
+            image_node.image = hover_image.clone();
+            tracing::debug!("关闭按钮显示悬停图片: {}", BTN_CLOSE_HOVER_IMAGE);
+        }
+    } else {
+        tracing::warn!("悬停图片未在缓存中找到: {}", BTN_CLOSE_HOVER_IMAGE);
+    }
+}
+
+/// 关闭按钮鼠标离开 - 恢复原始状态（清除背景图片）
+#[html_fn("btn_close_leave")]
+fn btn_close_leave(
+    In(event): In<HtmlMouseOut>,
+    mut query: Query<&mut ImageNode>,
+) {
+    // 清除按钮的背景图片
+    if let Ok(mut image_node) = query.get_mut(event.entity) {
+        image_node.image = Handle::default();
+        tracing::debug!("关闭按钮恢复原始状态");
+    }
 }
