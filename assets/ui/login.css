@@ -29,7 +29,7 @@ body {
   /* 使用 vw 单位，宽度高度都随窗口宽度变化 */
   /* 原始: 296/800=37%, 254/800=31.75% */
   width: 37vw;
-  height: 31.75vw;
+  height: 42.3vh;
   border: 1px solid blue;
 }
 
