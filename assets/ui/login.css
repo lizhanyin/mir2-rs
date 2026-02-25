@@ -27,9 +27,9 @@ body {
   align-items: center;
   justify-content: center;
   /* 使用 vw 单位，宽度高度都随窗口宽度变化 */
-  /* 原始: 296/800=37%, 254/800=31.75% */
+  /* 原始: 296/800=37%, 254/600=42.33% */
   width: 37vw;
-  height: 42.3vh;
+  height: 42.33vh;
   border: 1px solid blue;
 }
 
@@ -93,7 +93,7 @@ body {
   color: #ffffff;
   font-size: clamp(14px, 1.8vw, 18px);
   width: 22vw;
-  height: 3vw;
+  height: 4vh;
 }
 
 .form-group input:focus {
@@ -114,12 +114,12 @@ body {
 
 .btn-close {
   position: absolute;
-  top: 3.4vw;
+  top: 4.5vh;
   right: 3.4vw;
   min-width: 2vw;
-  height: 2.7vw;
+  height: 4vh;
   border: none;
-  background: rgba(255, 255, 255, 0);
+  /* background: rgba(255, 255, 255, 0); */
   cursor: pointer;
 }
 
@@ -194,7 +194,7 @@ input:invalid {
 
 .empty-row {
   width: 100%;
-  height: 5vw;
+  height: 6.5vh;
 
   border: 1px solid white;
 }

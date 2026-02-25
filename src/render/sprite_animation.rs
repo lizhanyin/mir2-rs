@@ -8,7 +8,6 @@
 
 use bevy::prelude::*;
 use std::collections::HashMap;
-use std::time::Duration;
 
 // ==================== 动画配置 ====================
 
@@ -352,7 +351,9 @@ impl AnimationClip {
         let local_frame = self.get_frame_at(progress);
         // 考虑 skip 字段：每帧实际占用的索引空间为 (1 + skip)
         let frame_stride = 1 + self.skip;
-        self.start_index + direction.index() * self.frames_per_direction * frame_stride + local_frame * frame_stride
+        self.start_index
+            + direction.index() * self.frames_per_direction * frame_stride
+            + local_frame * frame_stride
     }
 
     /// 获取每帧持续时间
@@ -575,7 +576,7 @@ impl SpriteAnimationState {
 // ==================== 动画播放器 ====================
 
 /// 动画播放器命令
-#[derive(Clone, Debug)]
+#[derive(Message, Clone, Debug)]
 pub enum AnimationCommand {
     /// 在世界坐标播放动画
     PlayAtWorld {
@@ -671,7 +672,7 @@ impl OneShotAnimation {
 // ==================== 动画事件 ====================
 
 /// 动画事件
-#[derive(Event, Clone, Debug)]
+#[derive(Message, Clone, Debug)]
 pub struct AnimationEvent {
     /// 触发动画的实体
     pub entity: Entity,
@@ -700,7 +701,7 @@ pub enum AnimationEventType {
 pub fn fixed_animation_update(
     time: Res<Time>,
     mut query: Query<(Entity, &mut SpriteAnimationState, &mut Sprite)>,
-    mut events: EventWriter<AnimationEvent>,
+    mut events: MessageWriter<AnimationEvent>,
 ) {
     let delta = time.delta_secs();
 
@@ -748,7 +749,7 @@ pub fn oneshot_animation_update(
 ) {
     let delta = time.delta_secs();
 
-    for (entity, mut anim, mut transform, mut sprite, visibility) in query.iter_mut() {
+    for (entity, mut anim, mut transform, mut sprite, _visibility) in query.iter_mut() {
         // 更新动画状态
         anim.state.update(delta);
 
@@ -780,7 +781,7 @@ pub fn oneshot_animation_update(
 /// 动画命令处理系统
 pub fn animation_command_handler(
     mut commands: Commands,
-    mut command_reader: EventReader<AnimationCommand>,
+    mut command_reader: MessageReader<AnimationCommand>,
     animation_library: Res<AnimationLibrary>,
 ) {
     for cmd in command_reader.read() {
@@ -793,7 +794,7 @@ pub fn animation_command_handler(
                 looping,
                 frames,
             } => {
-                let mut state = SpriteAnimationState::new(animation_name)
+                let mut state = SpriteAnimationState::new(animation_name.clone())
                     .with_direction(*direction)
                     .with_speed(*speed)
                     .with_frames(frames.clone());
@@ -820,7 +821,7 @@ pub fn animation_command_handler(
                 looping,
                 frames,
             } => {
-                let mut state = SpriteAnimationState::new(animation_name)
+                let mut state = SpriteAnimationState::new(animation_name.clone())
                     .with_direction(*direction)
                     .with_speed(*speed)
                     .with_frames(frames.clone());
@@ -846,7 +847,7 @@ pub fn animation_command_handler(
                 looping,
                 frames,
             } => {
-                let mut state = SpriteAnimationState::new(animation_name)
+                let mut state = SpriteAnimationState::new(animation_name.clone())
                     .with_direction(*direction)
                     .with_speed(*speed)
                     .with_frames(frames.clone());
@@ -883,7 +884,7 @@ impl SpriteAnimationPlayer {
         frames: Vec<Handle<Image>>,
         direction: AnimationDirection,
         speed: f32,
-        looping: bool,
+        _looping: bool,
     ) -> Entity {
         let state = SpriteAnimationState::new(animation_name)
             .with_direction(direction)
@@ -909,7 +910,7 @@ impl SpriteAnimationPlayer {
         frames: Vec<Handle<Image>>,
         direction: AnimationDirection,
         speed: f32,
-        looping: bool,
+        _looping: bool,
     ) -> Entity {
         let state = SpriteAnimationState::new(animation_name)
             .with_direction(direction)
@@ -934,7 +935,7 @@ impl SpriteAnimationPlayer {
         frames: Vec<Handle<Image>>,
         direction: AnimationDirection,
         speed: f32,
-        looping: bool,
+        _looping: bool,
     ) -> Entity {
         let state = SpriteAnimationState::new(animation_name)
             .with_direction(direction)
@@ -1036,17 +1037,35 @@ mod tests {
         //   progress=0.25 -> local_frame=1 -> 0 + 0*3 + 1*3 = 3
         //   progress=0.5 -> local_frame=2 -> 0 + 0*3 + 2*3 = 6
         //   progress=0.75 -> local_frame=3 -> 0 + 0*3 + 3*3 = 9
-        assert_eq!(clip.get_frame_at_with_direction(0.0, AnimationDirection::Down), 0);
-        assert_eq!(clip.get_frame_at_with_direction(0.25, AnimationDirection::Down), 3);
-        assert_eq!(clip.get_frame_at_with_direction(0.5, AnimationDirection::Down), 6);
-        assert_eq!(clip.get_frame_at_with_direction(0.75, AnimationDirection::Down), 9);
+        assert_eq!(
+            clip.get_frame_at_with_direction(0.0, AnimationDirection::Down),
+            0
+        );
+        assert_eq!(
+            clip.get_frame_at_with_direction(0.25, AnimationDirection::Down),
+            3
+        );
+        assert_eq!(
+            clip.get_frame_at_with_direction(0.5, AnimationDirection::Down),
+            6
+        );
+        assert_eq!(
+            clip.get_frame_at_with_direction(0.75, AnimationDirection::Down),
+            9
+        );
 
         // 方向 Left (index=2):
         //   基础偏移 = 2 * 4 * 3 = 24
         //   progress=0.0 -> local_frame=0 -> 0 + 24 + 0 = 24
         //   progress=0.25 -> local_frame=1 -> 0 + 24 + 3 = 27
-        assert_eq!(clip.get_frame_at_with_direction(0.0, AnimationDirection::Left), 24);
-        assert_eq!(clip.get_frame_at_with_direction(0.25, AnimationDirection::Left), 27);
+        assert_eq!(
+            clip.get_frame_at_with_direction(0.0, AnimationDirection::Left),
+            24
+        );
+        assert_eq!(
+            clip.get_frame_at_with_direction(0.25, AnimationDirection::Left),
+            27
+        );
     }
 
     #[test]

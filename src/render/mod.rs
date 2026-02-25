@@ -12,9 +12,9 @@ impl Plugin for RenderPlugin {
     fn build(&self, app: &mut App) {
         app // 初始化动画库
             .init_resource::<AnimationLibrary>()
-            // 注册动画事件
-            .add_event::<AnimationEvent>()
-            .add_event::<AnimationCommand>()
+            // 注册动画消息
+            .add_message::<AnimationEvent>()
+            .add_message::<AnimationCommand>()
             // 注册类型（用于反射和调试）
             .register_type::<AnimationAction>()
             .register_type::<AnimationDirection>()
