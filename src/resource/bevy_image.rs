@@ -9,7 +9,7 @@ use bevy_extended_ui::ImageCache;
 use image::RgbaImage;
 use std::path::Path;
 
-use super::formats::{load_images_by_indices_from_path, load_images_from_path, LibraryLoader};
+use super::formats::{LibraryLoader, load_images_by_indices_from_path, load_images_from_path};
 use crate::error::Result;
 
 /// 将 RgbaImage 转换为 Bevy Image

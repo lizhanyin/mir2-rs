@@ -13,11 +13,30 @@
 //! ```html
 //! <button onmouseenter="btn_hover_enter" onmouseleave="btn_hover_leave">按钮</button>
 //! ```
+//!
+//! ## CSS 状态 class
+//!
+//! 通过动态添加/移除 class 来切换按钮状态：
+//! - `hover` - 悬停状态
+//! - `active` - 按下状态
+//!
+//! CSS 示例：
+//! ```css
+//! .btn-close { /* 默认状态 */ }
+//! .btn-close.hover { /* 悬停状态 */ }
+//! .btn-close.active { /* 按下状态 */ }
+//! ```
 
 use bevy::prelude::*;
 use bevy_extended_ui::html::{HtmlClick, HtmlMouseOut, HtmlMouseOver};
+use bevy_extended_ui::styles::CssClass;
 use bevy_extended_ui::ImageCache;
 use bevy_extended_ui_macros::html_fn;
+
+/// 悬停状态 class 名
+pub const CLASS_HOVER: &str = "hover";
+/// 激活/按下状态 class 名
+pub const CLASS_ACTIVE: &str = "active";
 
 /// 悬停效果配置
 /// 存储按钮的悬停状态和图片信息
@@ -36,29 +55,85 @@ impl Plugin for UiEffectsPlugin {
     }
 }
 
+// ========== Class 操作辅助函数 ==========
+
+/// 添加 class 到元素
+pub fn add_class(css_class: &mut CssClass, class_name: &str) {
+    if !css_class.0.iter().any(|c| c == class_name) {
+        css_class.0.push(class_name.to_string());
+    }
+}
+
+/// 从元素移除 class
+pub fn remove_class(css_class: &mut CssClass, class_name: &str) {
+    css_class.0.retain(|c| c != class_name);
+}
+
+/// 检查元素是否有指定 class
+pub fn has_class(css_class: &CssClass, class_name: &str) -> bool {
+    css_class.0.iter().any(|c| c == class_name)
+}
+
+/// 切换 class（有则移除，无则添加）
+pub fn toggle_class(css_class: &mut CssClass, class_name: &str) {
+    if has_class(css_class, class_name) {
+        remove_class(css_class, class_name);
+    } else {
+        add_class(css_class, class_name);
+    }
+}
+
 // ========== 通用事件处理函数（可在 HTML 中直接使用）==========
 
-/// 通用鼠标进入事件 - 记录悬停状态
+/// 通用鼠标进入事件 - 添加 hover class
 /// 使用方法: onmouseenter="btn_hover_enter"
 #[html_fn("btn_hover_enter")]
-pub fn btn_hover_enter(In(event): In<HtmlMouseOver>, mut hover: ResMut<HoverEffects>) {
-    hover.hovered_entity = Some(event.entity);
-    tracing::debug!("鼠标进入按钮: {:?}", event.entity);
+pub fn btn_hover_enter(In(event): In<HtmlMouseOver>, mut query: Query<&mut CssClass>) {
+    if let Ok(mut css_class) = query.get_mut(event.entity) {
+        add_class(&mut css_class, CLASS_HOVER);
+        tracing::debug!("鼠标进入按钮: {:?}, 添加 hover class", event.entity);
+    }
 }
 
-/// 通用鼠标离开事件 - 清除悬停状态
+/// 通用鼠标离开事件 - 移除 hover 和 active class
 /// 使用方法: onmouseleave="btn_hover_leave"
 #[html_fn("btn_hover_leave")]
-pub fn btn_hover_leave(In(_event): In<HtmlMouseOut>, mut hover: ResMut<HoverEffects>) {
-    hover.hovered_entity = None;
-    tracing::debug!("鼠标离开按钮");
+pub fn btn_hover_leave(In(event): In<HtmlMouseOut>, mut query: Query<&mut CssClass>) {
+    if let Ok(mut css_class) = query.get_mut(event.entity) {
+        remove_class(&mut css_class, CLASS_HOVER);
+        remove_class(&mut css_class, CLASS_ACTIVE);
+        tracing::debug!("鼠标离开按钮: {:?}, 移除 hover/active class", event.entity);
+    }
 }
 
-/// 通用点击事件 - 记录点击
+/// 通用点击事件 - 切换 active class
 /// 使用方法: onclick="btn_click"
 #[html_fn("btn_click")]
-pub fn btn_click(In(event): In<HtmlClick>) {
-    tracing::debug!("按钮点击: {:?}", event.entity);
+pub fn btn_click(In(event): In<HtmlClick>, mut query: Query<&mut CssClass>) {
+    if let Ok(mut css_class) = query.get_mut(event.entity) {
+        toggle_class(&mut css_class, CLASS_ACTIVE);
+        tracing::debug!("按钮点击: {:?}, 切换 active class", event.entity);
+    }
+}
+
+/// 通用鼠标按下事件 - 添加 active class
+/// 使用方法: onmousedown="btn_press"
+#[html_fn("btn_press")]
+pub fn btn_press(In(event): In<HtmlMouseOver>, mut query: Query<&mut CssClass>) {
+    if let Ok(mut css_class) = query.get_mut(event.entity) {
+        add_class(&mut css_class, CLASS_ACTIVE);
+        tracing::debug!("按钮按下: {:?}, 添加 active class", event.entity);
+    }
+}
+
+/// 通用鼠标释放事件 - 移除 active class
+/// 使用方法: onmouseup="btn_release"
+#[html_fn("btn_release")]
+pub fn btn_release(In(event): In<HtmlMouseOut>, mut query: Query<&mut CssClass>) {
+    if let Ok(mut css_class) = query.get_mut(event.entity) {
+        remove_class(&mut css_class, CLASS_ACTIVE);
+        tracing::debug!("按钮释放: {:?}, 移除 active class", event.entity);
+    }
 }
 
 // ========== 按钮 ID 标记组件 ==========

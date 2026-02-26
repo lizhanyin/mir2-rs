@@ -5,18 +5,15 @@
     "rust-analyzer.inlayHints.chainingHints.enable": true,
     "rust-analyzer.inlayHints.parameterHints.enable": true,
     "rust-analyzer.inlayHints.typeHints.enable": true,
-
     // 文件排除
     "files.exclude": {
         "**/target": true,
         "**/.git": true
     },
-
     // 文件监视排除
     "files.watcherExclude": {
         "**/target/**": true
     },
-
     // 编辑器配置
     "editor.formatOnSave": true,
     "[rust]": {
@@ -24,7 +21,9 @@
         "editor.formatOnSave": true
     },
     "cSpell.words": [
+        "CHRSEL",
         "mlibrary",
+        "Prguse",
         "wemade"
     ]
 }

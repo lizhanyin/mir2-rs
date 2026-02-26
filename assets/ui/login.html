@@ -13,10 +13,12 @@
 
   <div class="login-container">
     <div class="login-box">
-      <form class="login-form" action="on_login" validate="登录">
-        <div class="">
-          <button type="button" class="btn-close" oninit="btn_close_init" onclick="on_close" onmouseenter="btn_close_enter" onmouseleave="btn_close_leave"></button>
+      <div class="box-title">
+        <div class="btn-close-container">
+          <button type="button" class="btn-close" onclick="on_close"></button>
         </div>
+      </div>
+      <form class="login-form" action="on_login" validate="登录">
         <div class="form-group empty-row"></div>
         <div class="form-group empty-row"></div>
         <div class="form-group">
@@ -38,6 +40,7 @@
           <a href="#" action="on_forgot">忘记密码</a>
         </div>
       </form>
+      <div class="box-footer"></div>
     </div>
     <!-- 
     <div class="footer">

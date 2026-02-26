@@ -5,9 +5,10 @@
 //!
 //! UI 图片从 Prguse.wzl 库加载：
 //! - index=60: 登录表单背景图 -> 缓存 key: Prguse_60.png
-//! - index=61: 登录按钮按下 -> 缓存 key: Prguse_61.png
-//! - index=64: 注册按钮按下 -> 缓存 key: Prguse_64.png
-//! - index=53: 退出按钮按下 -> 缓存 key: Prguse_53.png
+//! - index=62: 登录按钮按下 -> 缓存 key: Prguse_62.png
+//! - index=61: 注册按钮按下 -> 缓存 key: Prguse_61.png
+//! - index=53: 修改密码按钮按下 -> 缓存 key: Prguse_53.png
+//! - index=64: 退出按钮按下 -> 缓存 key: Prguse_64.png
 //!
 //! 图片通过 CSS background-image 使用，例如：
 //! background-image: url("ChrSel_22.png");
@@ -15,10 +16,10 @@
 //! 登录成功后的动画在 LoginSuccess 场景中播放
 
 use bevy::prelude::*;
-use bevy_extended_ui::html::{HtmlEvent, HtmlInit, HtmlMouseOut, HtmlMouseOver, HtmlSource, HtmlSubmit};
+use bevy_extended_ui::ImageCache;
+use bevy_extended_ui::html::{HtmlEvent, HtmlSource, HtmlSubmit};
 use bevy_extended_ui::io::HtmlAsset;
 use bevy_extended_ui::registry::UiRegistry;
-use bevy_extended_ui::ImageCache;
 use bevy_extended_ui_macros::html_fn;
 
 use crate::core::{GameConfig, GameState, SceneState};
@@ -48,9 +49,10 @@ const PRGUSE_LIBRARY: &str = "data/Prguse";
 
 /// Prguse.wzl 中的 UI 图片索引
 const UI_FORM_BG_INDEX: usize = 60; // 登录表单背景
-const UI_BTN_LOGIN_INDEX: usize = 61; // 登录按钮按下
-const UI_BTN_REG_INDEX: usize = 64; // 注册按钮按下
-const UI_BTN_EXIT_INDEX: usize = 53; // 退出按钮按下
+const UI_BTN_LOGIN_INDEX: usize = 62; // 登录按钮按下
+const UI_BTN_REG_INDEX: usize = 61; // 注册按钮按下
+const UI_BTN_CHANGE_PWD_INDEX: usize = 53; // 修改密码按钮按下
+const UI_BTN_EXIT_INDEX: usize = 64; // 退出按钮按下
 
 /// 登录 UI 图片资源
 #[derive(Resource, Default)]
@@ -93,8 +95,8 @@ fn setup_login(
         &config.resource_path,
         CHRSEL_LIBRARY,
         LOGIN_BG_INDEX,
-        &mut *image_cache,
-        &mut *images,
+        &mut image_cache,
+        &mut images,
     ) {
         Ok(_handle) => {
             tracing::debug!(
@@ -120,14 +122,14 @@ fn setup_login(
         &config.resource_path,
         PRGUSE_LIBRARY,
         &ui_indices,
-        &mut *image_cache,
-        &mut *images,
+        &mut image_cache,
+        &mut images,
     ) {
         Ok(ui_handle_list) => {
             tracing::debug!("加载 {} 张 UI 图片到缓存", ui_handle_list.len());
 
             // 保存 handle 供后续使用（如按钮交互）
-            if let Some(Some(handle)) = ui_handle_list.get(0) {
+            if let Some(Some(handle)) = ui_handle_list.first() {
                 ui_images.form_bg = Some(handle.clone());
                 tracing::debug!(
                     "表单背景缓存成功 (index={}), key: Prguse_{}.png",
@@ -168,10 +170,7 @@ fn setup_login(
     // 标记登录界面已加载
     commands.spawn(LoginScreen);
 
-    tracing::info!(
-        "进入登录场景，ImageCache 大小: {}",
-        image_cache.map.len()
-    );
+    tracing::info!("进入登录场景，ImageCache 大小: {}", image_cache.map.len());
 }
 
 fn cleanup_login(
@@ -232,54 +231,19 @@ fn on_forgot(In(_event): In<HtmlEvent>) {
 
 // ========== 关闭按钮事件 ==========
 
-/// 关闭按钮悬停图片缓存 key
-const BTN_CLOSE_HOVER_IMAGE: &str = "Prguse_64.png";
-
-/// 关闭按钮初始化事件
-#[html_fn("btn_close_init")]
-fn btn_close_init(In(event): In<HtmlInit>) {
-    tracing::debug!("关闭按钮初始化: entity={:?}", event.entity);
-}
-
-/// 关闭按钮点击事件 - 发送退出信号
+/// 关闭按钮点击事件 - 切换图片并退出
 #[html_fn("on_close")]
 fn on_close(
-    In(_event): In<HtmlEvent>,
+    In(event): In<HtmlEvent>,
+    mut query: Query<&mut bevy_extended_ui::styles::CssClass>,
     mut app_exit: bevy::ecs::message::MessageWriter<AppExit>,
 ) {
+    // 添加 active class 切换图片
+    if let Ok(mut css_class) = query.get_mut(event.target()) {
+        crate::ui::effects::add_class(&mut css_class, crate::ui::effects::CLASS_ACTIVE);
+        tracing::debug!("关闭按钮添加 active class");
+    }
+
     tracing::info!("点击关闭按钮，退出游戏");
-    // 发送 AppExit 消息来退出应用
     app_exit.write(AppExit::Success);
-}
-
-/// 关闭按钮鼠标进入 - 显示悬停图片
-#[html_fn("btn_close_enter")]
-fn btn_close_enter(
-    In(event): In<HtmlMouseOver>,
-    mut query: Query<&mut ImageNode>,
-    image_cache: Res<ImageCache>,
-) {
-    // 从缓存获取悬停图片
-    if let Some(hover_image) = image_cache.map.get(BTN_CLOSE_HOVER_IMAGE) {
-        // 查找按钮的 ImageNode 组件并设置悬停图片
-        if let Ok(mut image_node) = query.get_mut(event.entity) {
-            image_node.image = hover_image.clone();
-            tracing::debug!("关闭按钮显示悬停图片: {}", BTN_CLOSE_HOVER_IMAGE);
-        }
-    } else {
-        tracing::warn!("悬停图片未在缓存中找到: {}", BTN_CLOSE_HOVER_IMAGE);
-    }
-}
-
-/// 关闭按钮鼠标离开 - 恢复原始状态（清除背景图片）
-#[html_fn("btn_close_leave")]
-fn btn_close_leave(
-    In(event): In<HtmlMouseOut>,
-    mut query: Query<&mut ImageNode>,
-) {
-    // 清除按钮的背景图片
-    if let Ok(mut image_node) = query.get_mut(event.entity) {
-        image_node.image = Handle::default();
-        tracing::debug!("关闭按钮恢复原始状态");
-    }
 }
