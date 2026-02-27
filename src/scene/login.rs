@@ -238,10 +238,19 @@ fn on_close(
     mut query: Query<&mut bevy_extended_ui::styles::CssClass>,
     mut app_exit: bevy::ecs::message::MessageWriter<AppExit>,
 ) {
+    let target = event.target();
+    tracing::info!("关闭按钮点击事件触发, target entity: {:?}", target);
+
     // 添加 active class 切换图片
-    if let Ok(mut css_class) = query.get_mut(event.target()) {
-        crate::ui::effects::add_class(&mut css_class, crate::ui::effects::CLASS_ACTIVE);
-        tracing::debug!("关闭按钮添加 active class");
+    match query.get_mut(target) {
+        Ok(mut css_class) => {
+            tracing::info!("当前 class 列表: {:?}", css_class.0);
+            crate::ui::effects::add_class(&mut css_class, crate::ui::effects::CLASS_ACTIVE);
+            tracing::info!("添加 active class 后: {:?}", css_class.0);
+        }
+        Err(e) => {
+            tracing::warn!("无法获取 CssClass 组件: {:?}", e);
+        }
     }
 
     tracing::info!("点击关闭按钮，退出游戏");

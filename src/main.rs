@@ -184,9 +184,7 @@ fn get_log_dir() -> PathBuf {
 
 /// 保持窗口宽高比为 4:3
 /// 使用 changed 查询过滤器只在窗口大小变化时运行
-fn maintain_aspect_ratio(
-    mut windows: Query<&mut Window, (With<PrimaryWindow>, Changed<Window>)>,
-) {
+fn maintain_aspect_ratio(mut windows: Query<&mut Window, (With<PrimaryWindow>, Changed<Window>)>) {
     for mut window in windows.iter_mut() {
         let width = window.width();
         let height = window.height();

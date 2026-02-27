@@ -15,7 +15,13 @@
     <div class="login-box">
       <div class="box-title">
         <div class="btn-close-container">
-          <button type="button" class="btn-close" onclick="on_close"></button>
+          <button type="button" class="btn-close"
+              onmousedown="btn_press"
+              onmouseup="btn_release"
+              ondragstart="on_drag_start"
+              ondragstop="on_drag_stop"
+              onclick="on_close">
+          </button>
         </div>
       </div>
       <form class="login-form" action="on_login" validate="登录">

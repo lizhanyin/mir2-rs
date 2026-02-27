@@ -45,10 +45,10 @@ bevy = { version = "0.18", default-features = false, features = [
 ] }
 
 # bevy_extended_ui - HTML/CSS UI 框架 (禁用默认fluent避免sqlite3依赖)
-bevy_extended_ui = { git = " https://github.com/lizhanyin/bevy_extended_ui", branch = "bug-fix", default-features = false, features = [
+bevy_extended_ui = { path = "../bevy_extended_ui", default-features = false, features = [
     "css-breakpoints",
 ] }
-bevy_extended_ui_macros = "1.4"
+bevy_extended_ui_macros = { path = "../bevy_extended_ui/crates/bevy_extended_ui_macros" }
 
 # 图像处理
 image = "0.25"

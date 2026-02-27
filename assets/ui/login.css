@@ -17,7 +17,6 @@ body {
   /* background-image: url("ChrSel_22.png"); */
   background-position: center;
   background-size: cover;
-  background-repeat: no-repeat;
 }
 
 .login-container {
@@ -35,10 +34,9 @@ body {
 
 .login-box {
   /* 使用 ImageCache 中的表单背景图片 (Prguse_60.png) */
-  background-image: url("Prguse_60.png");
+  /* background-image: url("Prguse_60.png"); */
   background-position: center;
   background-size: 100% 100%;
-  background-repeat: no-repeat;
   width: 100%;
   height: 100%;
   position: relative;
@@ -50,7 +48,7 @@ body {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  font-size: clamp(12px, 1.5vw, 16px);
+  font-size: 14px;
   margin: 0 0 5px 0;
   height: 12vh;
   border: 1px solid orange;
@@ -60,14 +58,13 @@ body {
   display: flex;
   align-items: center;
   padding-right: 3.3vw;
-
   border: 1px solid green;
 }
 
 .login-form {
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 2vw, 20px);
+  gap: 15px;
   width: 100%;
   height: 100%;
   border: 1px solid white;
@@ -84,89 +81,84 @@ body {
 
 .form-group label {
   color: #cccccc;
-  font-size: clamp(12px, 1.5vw, 16px);
+  font-size: 14px;
   min-width: 60px;
 }
 
 .form-group input {
-  background: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, 0.5);
   border: 0;
   border-radius: 4px;
   padding: 8px 12px;
   margin-left: auto;
   margin-right: auto;
   color: #ffffff;
-  font-size: clamp(14px, 1.8vw, 18px);
+  font-size: 16px;
   width: 22vw;
   height: 4vh;
 }
 
 .form-group input:focus {
-  outline: none;
   border-color: #ffd700;
   box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
 }
 
-.form-group input::placeholder {
-  color: #666666;
-}
-
 .form-actions {
-  margin-top: clamp(10px, 2vw, 20px);
+  margin-top: 15px;
   display: flex;
   justify-content: center;
   border: 1px solid red;
 }
 
 .btn-close {
-  /* 默认状态 - 无背景 */
+  /* 默认状态 - 透明背景 */
   min-width: 2vw;
   height: 4vh;
   border: none;
-  /* background: rgba(255, 255, 255, 0); */
+  background-color: rgba(255, 255, 255, 0);
   cursor: pointer;
-  background-image: url("Prguse_64.png");
   background-position: center;
   background-size: 100% 100%;
-  background-repeat: no-repeat;
+}
+
+.btn-close:hover {
+  background-image: url("Prguse_64.png");
+  /* background-color: rgba(255, 255, 255, 0); */
 }
 
 /* 悬停状态 */
-.btn-close.hover {
-  background-image: url("Prguse_64.png");
+.btn-close-hover {
+  /* background-image: url("Prguse_64.png"); */
+  /* border: 1px solid red; */
 }
 
 /* 按下状态 */
-.btn-close.active {
+.btn-close-active {
+  border: 1px solid red;
   background-image: url("Prguse_64.png");
 }
 
-/* bevy_extended_ui 不支持 :active，需要在 Rust 中处理按下效果 */
-
 .btn-login {
-  width: clamp(35px, 12vw, 50px);
-  height: clamp(35px, 4.5vh, 50px);
+  width: 100px;
+  height: 40px;
   padding: 8px 16px;
-  /* background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%); */
+  background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%);
   border: none;
   border-radius: 4px;
-  color: #1a1a2e;
-  font-size: clamp(14px, 2vw, 18px);
+  color: rgb(185, 23, 23);
+  font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.3);
+  background-position: center;
+  background-size: 100% 100%;
 }
 
 .btn-login:hover {
   background: linear-gradient(180deg, #ffcc00 0%, #bb8800 100%);
 }
 
-.btn-login:active {
-  background: linear-gradient(180deg, #ffaa00 0%, #997700 100%);
-}
-
 .btn-login:disabled {
-  background: #555555;
+  background-color: #555555;
   color: #888888;
   cursor: not-allowed;
 }
@@ -174,14 +166,13 @@ body {
 .form-links {
   display: flex;
   justify-content: space-between;
-  margin-top: clamp(12px, 2vw, 20px);
+  margin-top: 15px;
   padding: 0 10px;
 }
 
 .form-links a {
   color: #888877;
-  font-size: clamp(11px, 1.4vw, 14px);
-  text-decoration: none;
+  font-size: 12px;
 }
 
 .form-links a:hover {
@@ -190,7 +181,6 @@ body {
 
 .footer {
   margin-top: 20px;
-  text-align: center;
 }
 
 .footer p {
@@ -199,20 +189,13 @@ body {
   margin: 0;
 }
 
-/* 验证错误样式 */
-input:invalid {
-  border-color: #ff4444;
-}
-
 /* 加载动画 */
 .loading {
-  opacity: 0.7;
   pointer-events: none;
 }
 
 .empty-row {
   width: 100%;
   height: 6.5vh;
-
   border: 1px solid yellow;
 }

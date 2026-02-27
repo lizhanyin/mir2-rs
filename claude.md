@@ -7,9 +7,11 @@ bevy_extended_ui path:
 1: E:\Workspace\project\Rust\bevy_extended_ui
 2: G:\workspace\Rust\bevy_extended_ui\examples
 )
+
 bevy_extended_ui
-examples
-示例项目
+
+examples 示例项目
+
 CSS_USAGE.md ${path}\CSS_USAGE.md
 本文件反映了 src/styles/parser.rs 实际解析和应用的规则。不支持的属性或值将被静默忽略。
 EVENT.md ${path}\EVENT.md

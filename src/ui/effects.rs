@@ -28,15 +28,17 @@
 //! ```
 
 use bevy::prelude::*;
-use bevy_extended_ui::html::{HtmlClick, HtmlMouseOut, HtmlMouseOver};
-use bevy_extended_ui::styles::CssClass;
 use bevy_extended_ui::ImageCache;
+use bevy_extended_ui::html::{
+    HtmlClick, HtmlDragStart, HtmlDragStop, HtmlMouseDown, HtmlMouseOut, HtmlMouseOver, HtmlMouseUp,
+};
+use bevy_extended_ui::styles::CssClass;
 use bevy_extended_ui_macros::html_fn;
 
 /// 悬停状态 class 名
-pub const CLASS_HOVER: &str = "hover";
+pub const CLASS_HOVER: &str = "btn-close-hover";
 /// 激活/按下状态 class 名
-pub const CLASS_ACTIVE: &str = "active";
+pub const CLASS_ACTIVE: &str = "btn-close-active";
 
 /// 悬停效果配置
 /// 存储按钮的悬停状态和图片信息
@@ -95,14 +97,16 @@ pub fn btn_hover_enter(In(event): In<HtmlMouseOver>, mut query: Query<&mut CssCl
     }
 }
 
-/// 通用鼠标离开事件 - 移除 hover 和 active class
+/// 通用鼠标离开事件 - 只移除 hover class
+/// 注意：不移除 active class，因为用户可能还在按住鼠标按键
+/// active class 会在 btn_release (mouseup) 或 on_drag_stop (dragstop) 时移除
 /// 使用方法: onmouseleave="btn_hover_leave"
 #[html_fn("btn_hover_leave")]
 pub fn btn_hover_leave(In(event): In<HtmlMouseOut>, mut query: Query<&mut CssClass>) {
     if let Ok(mut css_class) = query.get_mut(event.entity) {
         remove_class(&mut css_class, CLASS_HOVER);
-        remove_class(&mut css_class, CLASS_ACTIVE);
-        tracing::debug!("鼠标离开按钮: {:?}, 移除 hover/active class", event.entity);
+        // 不移除 CLASS_ACTIVE，因为用户可能还在按住鼠标
+        tracing::debug!("鼠标离开按钮: {:?}, 移除 hover class (保留 active class)", event.entity);
     }
 }
 
@@ -119,20 +123,57 @@ pub fn btn_click(In(event): In<HtmlClick>, mut query: Query<&mut CssClass>) {
 /// 通用鼠标按下事件 - 添加 active class
 /// 使用方法: onmousedown="btn_press"
 #[html_fn("btn_press")]
-pub fn btn_press(In(event): In<HtmlMouseOver>, mut query: Query<&mut CssClass>) {
+pub fn btn_press(In(event): In<HtmlMouseDown>, mut query: Query<&mut CssClass>) {
     if let Ok(mut css_class) = query.get_mut(event.entity) {
         add_class(&mut css_class, CLASS_ACTIVE);
-        tracing::debug!("按钮按下: {:?}, 添加 active class", event.entity);
+        tracing::info!(
+            "鼠标按下事件触发: entity={:?}, position={:?}, inner_position={:?}",
+            event.entity,
+            event.position,
+            event.inner_position
+        );
     }
 }
 
 /// 通用鼠标释放事件 - 移除 active class
 /// 使用方法: onmouseup="btn_release"
 #[html_fn("btn_release")]
-pub fn btn_release(In(event): In<HtmlMouseOut>, mut query: Query<&mut CssClass>) {
+pub fn btn_release(In(event): In<HtmlMouseUp>, mut query: Query<&mut CssClass>) {
     if let Ok(mut css_class) = query.get_mut(event.entity) {
         remove_class(&mut css_class, CLASS_ACTIVE);
-        tracing::debug!("按钮释放: {:?}, 移除 active class", event.entity);
+        tracing::info!(
+            "鼠标释放事件触发: entity={:?}, position={:?}, inner_position={:?}",
+            event.entity,
+            event.position,
+            event.inner_position
+        );
+    }
+}
+
+// ========== 拖拽事件（仅日志，不实现拖拽功能）==========
+
+/// 拖拽开始事件 - 仅记录日志
+/// 使用方法: ondragstart="on_drag_start"
+#[html_fn("on_drag_start")]
+pub fn on_drag_start(In(event): In<HtmlDragStart>) {
+    tracing::info!(
+        "拖拽开始事件触发: entity={:?}, position={:?}",
+        event.entity,
+        event.position
+    );
+}
+
+/// 拖拽结束事件 - 移除 active class
+/// 使用方法: ondragstop="on_drag_stop"
+#[html_fn("on_drag_stop")]
+pub fn on_drag_stop(In(event): In<HtmlDragStop>, mut query: Query<&mut CssClass>) {
+    if let Ok(mut css_class) = query.get_mut(event.entity) {
+        remove_class(&mut css_class, CLASS_ACTIVE);
+        tracing::info!(
+            "拖拽结束事件触发: entity={:?}, position={:?}, 已移除 active class",
+            event.entity,
+            event.position
+        );
     }
 }
 

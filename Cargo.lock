@@ -706,11 +706,10 @@ dependencies = [
 [[package]]
 name = "bevy_extended_ui"
 version = "1.0.0-beta.1"
-source = "git+https://github.com/lizhanyin/bevy_extended_ui?branch=bug-fix#a2ac7037cc5f9617bae2181ae5a1a367a426fec1"
 dependencies = [
  "arboard",
  "bevy",
- "bevy_extended_ui_macros 0.1.0",
+ "bevy_extended_ui_macros",
  "inventory",
  "js-sys",
  "kuchiki",
@@ -722,17 +721,6 @@ dependencies = [
 [[package]]
 name = "bevy_extended_ui_macros"
 version = "0.1.0"
-source = "git+https://github.com/lizhanyin/bevy_extended_ui?branch=bug-fix#a2ac7037cc5f9617bae2181ae5a1a367a426fec1"
-dependencies = [
- "quote",
- "syn 2.0.117",
-]
-
-[[package]]
-name = "bevy_extended_ui_macros"
-version = "1.4.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "db9b956061b6057836f6424bf57105e11cbc0de51aa194ee97b2d0e5196caaee"
 dependencies = [
  "quote",
  "syn 2.0.117",
@@ -3390,7 +3378,7 @@ dependencies = [
  "anyhow",
  "bevy",
  "bevy_extended_ui",
- "bevy_extended_ui_macros 1.4.0",
+ "bevy_extended_ui_macros",
  "byteorder",
  "directories",
  "flate2",
