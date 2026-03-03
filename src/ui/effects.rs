@@ -29,9 +29,10 @@
 
 use bevy::prelude::*;
 use bevy_extended_ui::ImageCache;
-use bevy_extended_ui::html::{
-    HtmlClick, HtmlDragStart, HtmlDragStop, HtmlMouseDown, HtmlMouseOut, HtmlMouseOver, HtmlMouseUp,
-};
+use bevy_extended_ui::html::{HtmlClick, HtmlDragStart, HtmlDragStop, HtmlMouseOut, HtmlMouseOver};
+// use bevy_extended_ui::html::{
+//     HtmlClick, HtmlDragStart, HtmlDragStop, HtmlMouseDown, HtmlMouseOut, HtmlMouseOver, HtmlMouseUp,
+// };
 use bevy_extended_ui::styles::CssClass;
 use bevy_extended_ui_macros::html_fn;
 
@@ -106,7 +107,10 @@ pub fn btn_hover_leave(In(event): In<HtmlMouseOut>, mut query: Query<&mut CssCla
     if let Ok(mut css_class) = query.get_mut(event.entity) {
         remove_class(&mut css_class, CLASS_HOVER);
         // 不移除 CLASS_ACTIVE，因为用户可能还在按住鼠标
-        tracing::debug!("鼠标离开按钮: {:?}, 移除 hover class (保留 active class)", event.entity);
+        tracing::debug!(
+            "鼠标离开按钮: {:?}, 移除 hover class (保留 active class)",
+            event.entity
+        );
     }
 }
 
@@ -122,33 +126,33 @@ pub fn btn_click(In(event): In<HtmlClick>, mut query: Query<&mut CssClass>) {
 
 /// 通用鼠标按下事件 - 添加 active class
 /// 使用方法: onmousedown="btn_press"
-#[html_fn("btn_press")]
-pub fn btn_press(In(event): In<HtmlMouseDown>, mut query: Query<&mut CssClass>) {
-    if let Ok(mut css_class) = query.get_mut(event.entity) {
-        add_class(&mut css_class, CLASS_ACTIVE);
-        tracing::info!(
-            "鼠标按下事件触发: entity={:?}, position={:?}, inner_position={:?}",
-            event.entity,
-            event.position,
-            event.inner_position
-        );
-    }
-}
+// #[html_fn("btn_press")]
+// pub fn btn_press(In(event): In<HtmlMouseDown>, mut query: Query<&mut CssClass>) {
+//     if let Ok(mut css_class) = query.get_mut(event.entity) {
+//         add_class(&mut css_class, CLASS_ACTIVE);
+//         tracing::info!(
+//             "鼠标按下事件触发: entity={:?}, position={:?}, inner_position={:?}",
+//             event.entity,
+//             event.position,
+//             event.inner_position
+//         );
+//     }
+// }
 
 /// 通用鼠标释放事件 - 移除 active class
 /// 使用方法: onmouseup="btn_release"
-#[html_fn("btn_release")]
-pub fn btn_release(In(event): In<HtmlMouseUp>, mut query: Query<&mut CssClass>) {
-    if let Ok(mut css_class) = query.get_mut(event.entity) {
-        remove_class(&mut css_class, CLASS_ACTIVE);
-        tracing::info!(
-            "鼠标释放事件触发: entity={:?}, position={:?}, inner_position={:?}",
-            event.entity,
-            event.position,
-            event.inner_position
-        );
-    }
-}
+// #[html_fn("btn_release")]
+// pub fn btn_release(In(event): In<HtmlMouseUp>, mut query: Query<&mut CssClass>) {
+//     if let Ok(mut css_class) = query.get_mut(event.entity) {
+//         remove_class(&mut css_class, CLASS_ACTIVE);
+//         tracing::info!(
+//             "鼠标释放事件触发: entity={:?}, position={:?}, inner_position={:?}",
+//             event.entity,
+//             event.position,
+//             event.inner_position
+//         );
+//     }
+// }
 
 // ========== 拖拽事件（仅日志，不实现拖拽功能）==========
 

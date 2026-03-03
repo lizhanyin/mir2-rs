@@ -1,9 +1,6 @@
 /* 热血传奇登录页面样式 */
 /* 背景图片通过 CSS background-image 显示，图片从 ImageCache 加载 */
 
-* {
-  box-sizing: border-box;
-}
 
 body {
   margin: 0;
@@ -29,7 +26,6 @@ body {
   /* 原始: 296/800=37%, 254/600=42.33% */
   width: 37vw;
   height: 42.33vh;
-  border: 1px solid blue;
 }
 
 .login-box {
@@ -48,17 +44,14 @@ body {
   display: flex;
   justify-content: flex-end;
   width: 100%;
-  font-size: 14px;
-  margin: 0 0 5px 0;
-  height: 12vh;
-  border: 1px solid orange;
+  height: 13.1vh;
 }
 
 .btn-close-container {
   display: flex;
   align-items: center;
-  padding-right: 3.3vw;
-  border: 1px solid green;
+  padding-right: 3.4vw;
+  /* border: 1px solid green; */
 }
 
 .login-form {
@@ -76,32 +69,37 @@ body {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: 8px;
+
+  padding: 0 12vw;
 }
 
 .form-group label {
   color: #cccccc;
-  font-size: 14px;
   min-width: 60px;
 }
 
 .form-group input {
-  background-color: rgba(255, 255, 255, 0.5);
+  background-color: rgba(255, 255, 255, .1);
   border: 0;
   border-radius: 4px;
-  padding: 8px 12px;
+  padding: 2px 1px;
   margin-left: auto;
   margin-right: auto;
-  color: #ffffff;
-  font-size: 16px;
-  width: 22vw;
-  height: 4vh;
+  margin-top: 0.6vh;
+  line-height: 0.6vh;
+  color: rgb(255, 255, 255);
+  width: 17vw;
+  height: 3.2vh;
 }
 
 .form-group input:focus {
   border-color: #ffd700;
-  box-shadow: 0 0 5px rgba(255, 215, 0, 0.3);
+  /* box-shadow: 0 0 5px rgba(255, 215, 0, 0.3); */
 }
+
+
+
+
 
 .form-actions {
   margin-top: 15px;
@@ -142,11 +140,11 @@ body {
   width: 100px;
   height: 40px;
   padding: 8px 16px;
-  background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%);
+  /* background: linear-gradient(180deg, #ffd700 0%, #cc9900 100%); */
+  background-color: rgba(255, 255, 255, 0);
   border: none;
   border-radius: 4px;
-  color: rgb(185, 23, 23);
-  font-size: 16px;
+  color: rgb(219, 215, 215);
   font-weight: bold;
   cursor: pointer;
   background-position: center;
@@ -172,7 +170,6 @@ body {
 
 .form-links a {
   color: #888877;
-  font-size: 12px;
 }
 
 .form-links a:hover {
@@ -185,7 +182,6 @@ body {
 
 .footer p {
   color: rgba(255, 255, 255, 0.4);
-  font-size: 11px;
   margin: 0;
 }
 

@@ -15,18 +15,12 @@
     <div class="login-box">
       <div class="box-title">
         <div class="btn-close-container">
-          <button type="button" class="btn-close"
-              onmousedown="btn_press"
-              onmouseup="btn_release"
-              ondragstart="on_drag_start"
-              ondragstop="on_drag_stop"
-              onclick="on_close">
+          <button type="button" class="btn-close" ondragstart="on_drag_start" ondragstop="on_drag_stop"
+            onclick="on_close">
           </button>
         </div>
       </div>
       <form class="login-form" action="on_login" validate="登录">
-        <div class="form-group empty-row"></div>
-        <div class="form-group empty-row"></div>
         <div class="form-group">
           <label for="username"></label>
           <input id="username" name="username" type="text" placeholder="" required validation="length(3, 32)">
@@ -38,7 +32,7 @@
         </div>
 
         <div class="form-actions">
-          <button type="submit" class="btn-login">登 录</button>
+          <button type="submit" class="btn-login">Login</button>
         </div>
 
         <div class="form-links">

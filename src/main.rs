@@ -36,7 +36,7 @@ fn main() {
 
     // 显示资源目录
     tracing::info!("========================================");
-    tracing::info!("热血传奇 - Mir2-RS");
+    tracing::info!("热血传奇");
     tracing::info!("========================================");
     tracing::info!("游戏资源目录: {}", config.resource_path.display());
     tracing::info!("窗口大小: {}x{}", config.screen_width, config.screen_height);
@@ -50,7 +50,7 @@ fn main() {
             DefaultPlugins
                 .set(WindowPlugin {
                     primary_window: Some(Window {
-                        title: "热血传奇 - Mir2-RS".to_string(),
+                        title: "mir2".to_string(),
                         resolution: (config.screen_width as u32, config.screen_height as u32)
                             .into(),
                         resizable: true,
